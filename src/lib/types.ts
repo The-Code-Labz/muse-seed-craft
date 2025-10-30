@@ -10,10 +10,10 @@ export interface Story {
     pacing: string;
     imagery: string;
   };
-  image_url: string;
-  story_text: string;
-  audio_url?: string;
-  created_at: string;
+  imageUrl: string;
+  content: string;
+  audioUrl?: string;
+  createdAt: string;
 }
 
 export interface GenerateRequest {

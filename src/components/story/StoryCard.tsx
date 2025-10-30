@@ -1,99 +1,80 @@
-import { Card } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { AudioPlayer } from './AudioPlayer';
 import { Story } from '@/lib/types';
-import { Calendar } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { Card } from '@/components/ui/card';
+import { AudioPlayer } from './AudioPlayer';
+import { Calendar, Sparkles } from 'lucide-react';
+import { format, isValid, parseISO } from 'date-fns';
 
 interface StoryCardProps {
   story: Story;
-  variant?: 'full' | 'compact';
-  className?: string;
+  variant?: 'default' | 'compact';
 }
 
-export function StoryCard({ story, variant = 'full', className }: StoryCardProps) {
-  const formattedDate = new Date(story.created_at).toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  });
+export function StoryCard({ story, variant = 'default' }: StoryCardProps) {
+  const isCompact = variant === 'compact';
 
-  if (variant === 'compact') {
-    return (
-      <Card className={cn("overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer group", className)}>
-        <div className="relative aspect-video overflow-hidden">
-          <img
-            src={story.image_url}
-            alt={story.title}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-            loading="lazy"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-          <Badge className="absolute top-3 left-3 bg-background/90 backdrop-blur-sm">
-            {story.seed}
-          </Badge>
-        </div>
-        
-        <div className="p-4 space-y-2">
-          <h3 className="font-semibold text-lg line-clamp-1">{story.title}</h3>
-          <p className="text-sm text-muted-foreground line-clamp-3">
-            {story.story_text}
-          </p>
-          
-          {story.audio_url && (
-            <div className="pt-2">
-              <AudioPlayer src={story.audio_url} />
-            </div>
-          )}
-        </div>
-      </Card>
-    );
-  }
+  // Safely format the date with validation
+  const formatDate = (dateString: string) => {
+    try {
+      const date = parseISO(dateString);
+      if (isValid(date)) {
+        return format(date, 'MMM d, yyyy');
+      }
+    } catch (error) {
+      console.error('Invalid date:', dateString, error);
+    }
+    return 'Recently';
+  };
 
   return (
-    <Card className={cn("overflow-hidden card-glass", className)}>
-      <div className="grid md:grid-cols-2 gap-6 p-6">
-        <div className="space-y-3">
-          <div className="relative aspect-video overflow-hidden rounded-2xl shadow-lg">
-            <img
-              src={story.image_url}
-              alt={story.title}
-              className="w-full h-full object-cover"
-            />
+    <Card className="overflow-hidden border-border/50 bg-card/50 backdrop-blur-sm hover:shadow-xl hover:shadow-primary/5 transition-all duration-300 group">
+      {/* Image */}
+      <div className="relative aspect-video overflow-hidden bg-muted">
+        <img
+          src={story.imageUrl}
+          alt={story.title}
+          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+          loading="lazy"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-background/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+      </div>
+
+      {/* Content */}
+      <div className="p-6 space-y-4">
+        {/* Header */}
+        <div className="space-y-2">
+          <div className="flex items-start justify-between gap-2">
+            <h3 className={`font-bold tracking-tight ${isCompact ? 'text-lg' : 'text-xl'}`}>
+              {story.title}
+            </h3>
+            <Sparkles className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
           </div>
-          <p className="text-xs text-muted-foreground italic">
-            Image generated with Pollinations.ai
+          
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <Calendar className="h-3.5 w-3.5" />
+            <time dateTime={story.createdAt}>
+              {formatDate(story.createdAt)}
+            </time>
+          </div>
+        </div>
+
+        {/* Story Content */}
+        <div className="space-y-3">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium">
+            <Sparkles className="h-3 w-3" />
+            Seed: {story.seed}
+          </div>
+          
+          <p className={`text-muted-foreground leading-relaxed ${isCompact ? 'text-sm line-clamp-3' : 'text-base'}`}>
+            {story.content}
           </p>
         </div>
 
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <div className="flex items-center gap-2 flex-wrap">
-              <Badge variant="secondary" className="rounded-full">
-                {story.seed}
-              </Badge>
-              <div className="flex items-center text-xs text-muted-foreground">
-                <Calendar className="h-3 w-3 mr-1" />
-                {formattedDate}
-              </div>
-            </div>
-            
-            <h2 className="text-3xl font-bold tracking-tight">{story.title}</h2>
+        {/* Audio Player */}
+        {!isCompact && story.audioUrl && (
+          <div className="pt-2">
+            <AudioPlayer audioUrl={story.audioUrl} />
           </div>
-
-          <div className="prose prose-sm max-w-none">
-            {story.story_text.split('\n\n').map((paragraph, i) => (
-              <p key={i}>{paragraph}</p>
-            ))}
-          </div>
-
-          {story.audio_url && (
-            <div className="pt-4 border-t">
-              <p className="text-sm font-medium mb-3">Listen to narration:</p>
-              <AudioPlayer src={story.audio_url} />
-            </div>
-          )}
-        </div>
+        )}
       </div>
     </Card>
   );

@@ -3,30 +3,18 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 export function LoadingCard() {
   return (
-    <Card className="overflow-hidden card-glass">
-      <div className="grid md:grid-cols-2 gap-6 p-6">
-        <div className="space-y-3">
-          <Skeleton className="aspect-video rounded-2xl" />
-          <Skeleton className="h-3 w-48" />
+    <Card className="overflow-hidden border-border/50 bg-card/50 backdrop-blur-sm">
+      <Skeleton className="aspect-video w-full bg-primary/10" />
+      <div className="p-6 space-y-4">
+        <div className="space-y-2">
+          <Skeleton className="h-6 w-3/4 bg-muted/50" />
+          <Skeleton className="h-4 w-24 bg-muted/50" />
         </div>
-
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <Skeleton className="h-6 w-32" />
-            <Skeleton className="h-10 w-full" />
-          </div>
-
-          <div className="space-y-2">
-            <Skeleton className="h-4 w-full" />
-            <Skeleton className="h-4 w-full" />
-            <Skeleton className="h-4 w-3/4" />
-            <Skeleton className="h-4 w-full" />
-            <Skeleton className="h-4 w-5/6" />
-          </div>
-
-          <div className="pt-4">
-            <Skeleton className="h-12 w-full rounded-full" />
-          </div>
+        <div className="space-y-2">
+          <Skeleton className="h-6 w-32 bg-muted/50" />
+          <Skeleton className="h-4 w-full bg-muted/50" />
+          <Skeleton className="h-4 w-full bg-muted/50" />
+          <Skeleton className="h-4 w-2/3 bg-muted/50" />
         </div>
       </div>
     </Card>
